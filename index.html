@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Piri Reis'in Dünya Haritası</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap');
+
+body{
+    overflow:hidden;
+    background:#2a180c;
+    color:#3d2412;
+    font-family:"Libre Baskerville",serif;
+}
+
+.presentation{
+    width:100vw;
+    height:100vh;
+    position:relative;
+    overflow:hidden;
+
+    background:
+        radial-gradient(circle at 15% 15%,rgba(255,255,255,.25),transparent 25%),
+        radial-gradient(circle at 85% 80%,rgba(70,35,10,.22),transparent 30%),
+        linear-gradient(135deg,#ecd39b,#d8b875,#bd914e);
+}
+
+.presentation::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:.18;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 5px,
+            rgba(60,30,5,.05) 6px
+        );
+}
+
+
+/* SLAYT */
+
+.slide{
+    position:absolute;
+    inset:0;
+
+    padding:55px 8vw 100px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    opacity:0;
+    visibility:hidden;
+
+    transform:translateX(40px) scale(.98);
+
+    transition:
+        opacity .5s ease,
+        transform .5s ease,
+        visibility .5s;
+}
+
+.slide.active{
+    opacity:1;
+    visibility:visible;
+    transform:translateX(0) scale(1);
+}
+
+
+/* ÇERÇEVE */
+
+.frame{
+    position:absolute;
+    inset:22px;
+
+    border:2px solid rgba(55,31,12,.55);
+
+    box-shadow:
+        inset 0 0 0 7px rgba(240,210,150,.25),
+        inset 0 0 70px rgba(60,30,8,.15);
+
+    pointer-events:none;
+}
+
+.corner{
+    position:absolute;
+    width:65px;
+    height:65px;
+    opacity:.65;
+}
+
+.tl{
+    top:35px;
+    left:35px;
+    border-top:3px solid #432612;
+    border-left:3px solid #432612;
+}
+
+.tr{
+    top:35px;
+    right:35px;
+    border-top:3px solid #432612;
+    border-right:3px solid #432612;
+}
+
+.bl{
+    bottom:35px;
+    left:35px;
+    border-bottom:3px solid #432612;
+    border-left:3px solid #432612;
+}
+
+.br{
+    bottom:35px;
+    right:35px;
+    border-bottom:3px solid #432612;
+    border-right:3px solid #432612;
+}
+
+
+/* BAŞLIKLAR */
+
+.kicker{
+    font-family:Cinzel,serif;
+    font-weight:700;
+    letter-spacing:6px;
+    font-size:17px;
+    text-transform:uppercase;
+    color:#704617;
+    margin-bottom:18px;
+}
+
+h1,
+h2{
+    font-family:Cinzel,serif;
+    color:#39200c;
+    text-align:center;
+}
+
+h1{
+    font-size:clamp(45px,6vw,88px);
+    line-height:1.05;
+}
+
+h2{
+    font-size:clamp(34px,4vw,58px);
+    margin-bottom:28px;
+}
+
+.subtitle{
+    max-width:800px;
+    text-align:center;
+    font-size:20px;
+    line-height:1.7;
+    margin-top:15px;
+}
+
+.ornament{
+    width:150px;
+    height:4px;
+    background:#8c5b1d;
+    margin:26px auto;
+    position:relative;
+}
+
+.ornament::before,
+.ornament::after{
+    content:"✦";
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+}
+
+.ornament::before{
+    left:-25px;
+}
+
+.ornament::after{
+    right:-25px;
+}
+
+
+/* KAPAK */
+
+.names{
+    margin-top:25px;
+    text-align:center;
+    font-weight:bold;
+    font-size:18px;
+    line-height:2;
+}
+
+.prepared{
+    margin-top:18px;
+    font-size:15px;
+    opacity:.8;
+}
+
+
+/* İÇERİK */
+
+.content{
+    width:min(1100px,90vw);
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+
+    gap:40px;
+
+    align-items:center;
+}
+
+.text{
+    background:rgba(255,244,211,.38);
+
+    border:1px solid rgba(60,35,15,.35);
+
+    padding:30px;
+
+    font-size:16px;
+    line-height:1.9;
+
+    box-shadow:
+        0 12px 30px rgba(50,25,5,.12);
+}
+
+.text strong{
+    color:#704617;
+}
+
+
+/* RESİMLER */
+
+.photo{
+    width:100%;
+    height:430px;
+
+    object-fit:cover;
+
+    padding:8px;
+
+    background:#b88b4e;
+
+    border:2px solid #674016;
+
+    box-shadow:
+        0 15px 35px rgba(45,25,8,.3);
+}
+
+.contain{
+    object-fit:contain;
+}
+
+
+/* HARİTADA NELER VAR */
+
+.map-layout{
+    width:min(1200px,92vw);
+
+    display:grid;
+
+    grid-template-columns:1.25fr .75fr;
+
+    gap:28px;
+
+    align-items:stretch;
+}
+
+.map-main{
+    width:100%;
+    height:520px;
+
+    object-fit:cover;
+
+    padding:8px;
+
+    background:#b88b4e;
+
+    border:2px solid #674016;
+
+    box-shadow:
+        0 15px 35px rgba(45,25,8,.3);
+}
+
+.map-info{
+    display:grid;
+
+    grid-template-rows:auto auto;
+
+    gap:20px;
+}
+
+.map-small{
+    width:100%;
+    height:220px;
+
+    object-fit:cover;
+
+    padding:7px;
+
+    background:#b88b4e;
+
+    border:2px solid #674016;
+
+    box-shadow:
+        0 10px 25px rgba(45,25,8,.2);
+}
+
+.map-text{
+    background:rgba(255,244,211,.42);
+
+    border:1px solid rgba(60,35,15,.35);
+
+    padding:22px;
+
+    line-height:1.65;
+
+    font-size:14px;
+
+    box-shadow:
+        0 10px 25px rgba(50,25,5,.12);
+}
+
+.map-text h3{
+    font-family:Cinzel,serif;
+
+    color:#5b3714;
+
+    font-size:20px;
+
+    margin-bottom:12px;
+}
+
+.map-text p{
+    margin-bottom:8px;
+}
+
+
+/* KARTLAR */
+
+.cards{
+    width:min(1150px,90vw);
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:22px;
+}
+
+.card{
+    background:rgba(255,244,211,.4);
+
+    border:1px solid rgba(60,35,15,.35);
+
+    padding:25px;
+
+    min-height:230px;
+
+    box-shadow:
+        0 10px 25px rgba(50,25,5,.12);
+}
+
+.card h3{
+    font-family:Cinzel,serif;
+
+    color:#5b3714;
+
+    font-size:21px;
+
+    margin-bottom:15px;
+}
+
+.card p{
+    font-size:15px;
+
+    line-height:1.7;
+}
+
+
+/* GALERİ */
+
+.gallery{
+    width:min(1100px,90vw);
+
+    display:grid;
+
+    grid-template-columns:1.2fr .8fr;
+
+    gap:25px;
+}
+
+.gallery-main{
+    width:100%;
+    height:430px;
+
+    object-fit:cover;
+
+    padding:8px;
+
+    background:#b88b4e;
+
+    border:2px solid #674016;
+}
+
+.gallery-side{
+    display:grid;
+
+    gap:18px;
+}
+
+.gallery-side img{
+    width:100%;
+    height:205px;
+
+    object-fit:cover;
+
+    padding:6px;
+
+    background:#b88b4e;
+
+    border:2px solid #674016;
+}
+
+
+/* KAYNAKÇA */
+
+.source-list{
+    width:min(900px,88vw);
+
+    background:rgba(255,244,211,.4);
+
+    border:1px solid rgba(60,35,15,.35);
+
+    padding:30px 40px;
+
+    font-size:16px;
+
+    line-height:2.1;
+}
+
+.source-list li{
+    margin-left:25px;
+}
+
+
+/* NAVİGASYON */
+
+.nav{
+    position:fixed;
+
+    bottom:20px;
+
+    left:0;
+    right:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:15px;
+
+    z-index:20;
+}
+
+.nav button{
+    width:48px;
+    height:48px;
+
+    border-radius:50%;
+
+    border:1px solid #5d3a16;
+
+    background:rgba(246,223,166,.95);
+
+    color:#3a220e;
+
+    font-size:25px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.nav button:hover{
+    transform:scale(1.1);
+
+    background:#f3d79e;
+}
+
+.counter{
+    font-family:Cinzel,serif;
+
+    font-weight:bold;
+
+    min-width:65px;
+
+    text-align:center;
+}
+
+
+/* ÜST İLERLEME ÇUBUĞU */
+
+.progress{
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    height:5px;
+
+    background:#76501d;
+
+    z-index:50;
+
+    width:11.11%;
+
+    transition:.4s;
+}
+
+
+/* MOBİL */
+
+@media(max-width:800px){
+
+    .slide{
+        padding:35px 8vw 90px;
+    }
+
+    .content{
+        grid-template-columns:1fr;
+        gap:20px;
+    }
+
+    .photo{
+        height:250px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .card{
+        min-height:auto;
+    }
+
+    .map-layout{
+        grid-template-columns:1fr;
+    }
+
+    .map-main{
+        height:300px;
+    }
+
+    .map-small{
+        display:none;
+    }
+
+    .gallery{
+        grid-template-columns:1fr;
+    }
+
+    .gallery-main{
+        height:270px;
+    }
+
+    .gallery-side{
+        display:none;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="presentation">
+
+<div class="progress" id="progress"></div>
+
+
+<!-- ================================================= -->
+<!-- 1. KAPAK -->
+<!-- ================================================= -->
+
+<section class="slide active">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+Coğrafya Araştırması
+</div>
+
+<h1>
+Piri Reis'in<br>
+Dünya Haritası
+</h1>
+
+<div class="ornament"></div>
+
+<div class="subtitle">
+1513 tarihli Dünya Haritası ve
+Piri Reis'in coğrafyaya katkıları
+</div>
+
+<div class="names">
+
+9/A Sarp Çınar ER<br>
+
+9/A Göktuğ SAY<br>
+
+9/A Eren GÜLER<br>
+
+9/A Ömer KALA
+
+</div>
+
+<div class="prepared">
+
+Web Sitesi Hazırlayan:
+9/A Efe KARABAKİROĞLU
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 2. PİRİ REİS KİMDİR -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+I · Piri Reis
+</div>
+
+<h2>
+Piri Reis Kimdir?
+</h2>
+
+<div class="content">
+
+<div class="text">
+
+<p>
+<strong>Piri Reis</strong>, Osmanlı döneminin
+ünlü denizcilerinden ve haritacılarından biridir.
+</p>
+
+<br>
+
+<p>
+Asıl adı Muhiddin Piri'dir.
+Denizcilik alanındaki tecrübelerini haritacılık
+bilgisiyle birleştirmiştir.
+</p>
+
+<br>
+
+<p>
+En önemli eserlerinden biri
+<strong>Kitab-ı Bahriye</strong> adlı denizcilik
+ve haritacılık kitabıdır.
+</p>
+
+<br>
+
+<p>
+Onu dünya çapında tanıtan en önemli eserlerinden
+biri ise <strong>1513 tarihli Dünya Haritası</strong>dır.
+</p>
+
+</div>
+
+<img
+src="pirireis.jpg"
+class="photo contain"
+alt="Piri Reis">
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 3. 1513 DÜNYA HARİTASI -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+II · 1513 Dünya Haritası
+</div>
+
+<h2>
+Piri Reis'in Dünya Haritası
+</h2>
+
+<div class="content">
+
+<img
+src="harita.jpg"
+class="photo contain"
+alt="Piri Reis Dünya Haritası">
+
+<div class="text">
+
+<p>
+Piri Reis'in en önemli eserlerinden biri olan
+Dünya Haritası <strong>1513 yılında</strong>
+hazırlanmıştır.
+</p>
+
+<br>
+
+<p>
+Haritanın günümüze yalnızca bir bölümü
+ulaşabilmiştir.
+</p>
+
+<br>
+
+<p>
+Haritada özellikle Atlas Okyanusu,
+Avrupa ve Afrika'nın batı kıyıları ile
+Güney Amerika'nın doğu kıyıları görülmektedir.
+</p>
+
+<br>
+
+<p>
+Harita, döneminin coğrafi bilgilerini ve
+denizcilik tecrübelerini yansıtan önemli
+bir tarihî belgedir.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 4. HARİTADA NELER VAR -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+III · Haritanın Ayrıntıları
+</div>
+
+<h2>
+Haritada Neler Var?
+</h2>
+
+<div class="map-layout">
+
+
+<!-- BÜYÜK HARİTA -->
+
+<img
+src="harita2.jpg"
+class="map-main"
+alt="Piri Reis haritası ayrıntısı">
+
+
+<div class="map-info">
+
+
+<!-- KÜÇÜK HARİTA -->
+
+<img
+src="harita3.jpg"
+class="map-small"
+alt="Piri Reis haritası">
+
+
+<!-- AÇIKLAMALAR -->
+
+<div class="map-text">
+
+<h3>
+Haritanın İçeriği
+</h3>
+
+<p>
+🧭 <strong>Pusula ve yön çizgileri:</strong>
+Denizcilerin yön bulmasına yardımcı olur.
+</p>
+
+<p>
+🌊 <strong>Denizler ve okyanuslar:</strong>
+Özellikle Atlas Okyanusu ve çevresindeki
+denizler gösterilmiştir.
+</p>
+
+<p>
+🗺️ <strong>Kıyılar ve adalar:</strong>
+Avrupa, Afrika ve Güney Amerika'nın
+bazı kıyıları ayrıntılı şekilde çizilmiştir.
+</p>
+
+<p>
+⛵ <strong>Gemiler:</strong>
+Denizcilik ve keşifleri temsil eden
+gemi çizimleri bulunmaktadır.
+</p>
+
+<p>
+✍️ <strong>Açıklamalar:</strong>
+Harita üzerinde bölgeler hakkında
+çeşitli yazılı bilgiler yer almaktadır.
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 5. HARİTANIN ÖZELLİKLERİ -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+IV · Haritanın Özellikleri
+</div>
+
+<h2>
+Haritanın Özellikleri
+</h2>
+
+<div class="cards">
+
+
+<div class="card">
+
+<h3>
+🧭 Yönler
+</h3>
+
+<p>
+Haritada pusula gülleri ve çeşitli yön
+çizgileri bulunmaktadır. Bu çizgiler
+denizcilerin yön bulmasına yardımcı olmuştur.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+🌊 Denizcilik
+</h3>
+
+<p>
+Haritanın hazırlanmasında Piri Reis'in
+denizcilik tecrübeleri ve farklı denizcilik
+kaynaklarından elde edilen bilgiler kullanılmıştır.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+🌎 Amerika
+</h3>
+
+<p>
+Haritanın en dikkat çekici özelliklerinden
+biri Güney Amerika'nın doğu kıyılarının
+ayrıntılı şekilde gösterilmesidir.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 6. HARİTANIN ÖNEMİ -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+V · Coğrafi Önemi
+</div>
+
+<h2>
+Neden Önemlidir?
+</h2>
+
+<div class="content">
+
+<div class="text">
+
+<p>
+<strong>1.</strong>
+16. yüzyıl başındaki coğrafi bilgi birikimini
+göstermektedir.
+</p>
+
+<br>
+
+<p>
+<strong>2.</strong>
+Osmanlı dönemindeki haritacılık ve denizcilik
+çalışmalarının önemli bir örneğidir.
+</p>
+
+<br>
+
+<p>
+<strong>3.</strong>
+Yeni keşfedilen bölgeler hakkındaki bilgileri
+göstermesi açısından önemlidir.
+</p>
+
+<br>
+
+<p>
+<strong>4.</strong>
+Günümüzde tarih, coğrafya ve denizcilik
+araştırmaları açısından değerli bir eserdir.
+</p>
+
+</div>
+
+<img
+src="harita3.jpg"
+class="photo contain"
+alt="Piri Reis Haritası">
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 7. PİRİ REİS VE DENİZCİLİK -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+VI · Denizcilik
+</div>
+
+<h2>
+Piri Reis ve Denizcilik
+</h2>
+
+<div class="content">
+
+<img
+src="pirireis2.jpg"
+class="photo"
+alt="Piri Reis">
+
+<div class="text">
+
+<p>
+Piri Reis hayatının büyük bölümünü
+denizlerde geçirmiştir.
+</p>
+
+<br>
+
+<p>
+Bu deneyimler onun harita çizimlerinde
+denizcilik bilgilerinden yararlanmasını
+sağlamıştır.
+</p>
+
+<br>
+
+<p>
+<strong>Kitab-ı Bahriye</strong> adlı eseri,
+Akdeniz kıyıları ve denizcilik hakkında
+çok sayıda bilgi içermektedir.
+</p>
+
+<br>
+
+<p>
+Bu nedenle Piri Reis, Türk ve Osmanlı
+denizcilik tarihinin en önemli isimlerinden
+biri kabul edilir.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 8. SONUÇ -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+VII · Sonuç
+</div>
+
+<h2>
+Sonuç
+</h2>
+
+<div
+class="text"
+style="max-width:900px;text-align:center;font-size:18px">
+
+<p>
+Piri Reis'in Dünya Haritası yalnızca eski
+bir harita değildir.
+</p>
+
+<br>
+
+<p>
+Bu eser;
+<strong>
+coğrafya, denizcilik, keşifler ve tarih
+</strong>
+açısından büyük önem taşımaktadır.
+</p>
+
+<br>
+
+<p>
+1513 yılında hazırlanan harita, kendi dönemindeki
+coğrafi bilgi birikimini günümüze taşıyan
+önemli bir kültürel mirastır.
+</p>
+
+<div class="ornament"></div>
+
+<p>
+<strong>
+Piri Reis'in çalışmaları, geçmişte dünyanın
+nasıl keşfedildiğini anlamamıza yardımcı olur.
+</strong>
+</p>
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- 9. KAYNAKÇA -->
+<!-- ================================================= -->
+
+<section class="slide">
+
+<div class="frame"></div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="kicker">
+VIII · Kaynakça
+</div>
+
+<h2>
+Kaynakça
+</h2>
+
+<div class="source-list">
+
+<ul>
+
+<li>
+UNESCO — Piri Reis Dünya Haritası
+</li>
+
+<li>
+Topkapı Sarayı Müzesi — Piri Reis Haritası
+</li>
+
+<li>
+Türk Tarih Kurumu — Piri Reis ve Osmanlı Haritacılığı
+</li>
+
+<li>
+Piri Reis — Kitab-ı Bahriye
+</li>
+
+<li>
+Coğrafya ve haritacılık tarihi kaynakları
+</li>
+
+</ul>
+
+</div>
+
+<div
+class="prepared"
+style="text-align:center">
+
+9/A Sarp Çınar ER ·
+9/A Göktuğ SAY ·
+9/A Eren GÜLER ·
+9/A Ömer KALA
+
+<br>
+
+Web Sitesi Hazırlayan:
+9/A Efe KARABAKİROĞLU
+
+</div>
+
+</section>
+
+
+
+<!-- ================================================= -->
+<!-- NAVİGASYON -->
+<!-- ================================================= -->
+
+<div class="nav">
+
+<button id="prev">
+‹
+</button>
+
+<div class="counter" id="counter">
+1 / 9
+</div>
+
+<button id="next">
+›
+</button>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+const slides =
+document.querySelectorAll(".slide");
+
+const counter =
+document.getElementById("counter");
+
+const progress =
+document.getElementById("progress");
+
+let current = 0;
+
+
+function showSlide(index){
+
+    current =
+    (index + slides.length)
+    % slides.length;
+
+    slides.forEach((slide,i)=>{
+
+        slide.classList.toggle(
+            "active",
+            i === current
+        );
+
+    });
+
+    counter.textContent =
+    `${current + 1} / ${slides.length}`;
+
+    progress.style.width =
+    `${((current + 1) / slides.length) * 100}%`;
+}
+
+
+document.getElementById("next").onclick = () => {
+
+    showSlide(current + 1);
+
+};
+
+
+document.getElementById("prev").onclick = () => {
+
+    showSlide(current - 1);
+
+};
+
+
+document.addEventListener("keydown",(event)=>{
+
+    if(
+        event.key === "ArrowRight" ||
+        event.key === " " ||
+        event.key === "PageDown"
+    ){
+
+        showSlide(current + 1);
+
+    }
+
+
+    if(
+        event.key === "ArrowLeft" ||
+        event.key === "PageUp"
+    ){
+
+        showSlide(current - 1);
+
+    }
+
+
+    if(event.key === "Home"){
+
+        showSlide(0);
+
+    }
+
+
+    if(event.key === "End"){
+
+        showSlide(slides.length - 1);
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
